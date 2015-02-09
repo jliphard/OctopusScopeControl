@@ -49,13 +49,13 @@ extern COctopusMultifunction*    glob_m_pNI;
 COctopusCamera::COctopusCamera(CWnd* pParent)
 	: CDialog(COctopusCamera::IDD, pParent)
 {    
-	B.files_written			= 0;
-	B.savetofile			= false;
+	B.files_written		= 0;
+	B.savetofile		= false;
 	B.W                     = 0;
 	B.H                     = 0;
-	B.automatic_gain		= true;
-	B.manual_gain			= 0.05;
-	B.pics_per_file			= 200;
+	B.automatic_gain	= true;
+	B.manual_gain		= 0.05;
+	B.pics_per_file		= 200;
 	B.Camera_Thread_running = false;
 	B.bin                   = 1;
 	B.memory                = NULL;
@@ -69,32 +69,34 @@ COctopusCamera::COctopusCamera(CWnd* pParent)
 
 	//allocate lots of memory and be done with it...
 	//this is way more than we should ever need.
-
 	B.memory = new u16 [201 * 512 * 512];
-	u32_Exposure_Time_Single_ms = 50;
-	u32_Exposure_Time_Movie_ms  = 50;
-	B.CameraExpTime_ms          = u32_Exposure_Time_Single_ms;
-	u16_Gain_Mult_Factor_Single = 1;
-	u16_Gain_Mult_Factor_Movie  = 1;
-	m_IDC_MANUAL_GAIN           = B.manual_gain;
-	m_DISPLAY_GAIN_CHOICE       = 1;
-	m_DISPLAY_VSSPEED           = 3;
-	m_DISPLAY_GL                = 0;
-	m_DISPLAY_BIN_CHOICE        = B.bin - 1;
-	m_IDC_PICTURES_PER_FILE     = B.pics_per_file;
-	m_CCD_target_temp		    = 10;
-	m_CCD_current_temp          = 0;
+
+	u32_Exposure_Time_Single_ms 	= 50;
+	u32_Exposure_Time_Movie_ms  	= 50;
+	B.CameraExpTime_ms          	= u32_Exposure_Time_Single_ms;
+	u16_Gain_Mult_Factor_Single 	= 1;
+	u16_Gain_Mult_Factor_Movie  	= 1;
+	m_IDC_MANUAL_GAIN           	= B.manual_gain;
+	m_DISPLAY_GAIN_CHOICE       	= 1;
+	m_DISPLAY_VSSPEED           	= 3;
+	m_DISPLAY_GL                	= 0;
+	m_DISPLAY_BIN_CHOICE        	= B.bin - 1;
+	m_IDC_PICTURES_PER_FILE     	= B.pics_per_file;
+	m_CCD_target_temp		= 10;
+	m_CCD_current_temp          	= 0;
 	
 	//default the converter to 1 MHZ conventional
-	m_DISPLAY_HSSPEED           = 0;
-	B.Ampl_Conv					= false; //does not really matter. will be set correctly by OnHSSPEED_X() anyway
+	m_DISPLAY_HSSPEED           	= 0;
+
+	//does not really matter. will be set correctly by OnHSSPEED_X() anyway
+	B.Ampl_Conv			= false; 
 
 	VERIFY(m_bmp_no.LoadBitmap(IDB_NO));
 	VERIFY(m_bmp_yes.LoadBitmap(IDB_YES));
 	
-    CString currentDir;
-    GetCurrentDirectory( MAX_PATH, currentDir.GetBufferSetLength(MAX_PATH) );
-    currentDir.ReleaseBuffer();
+    	CString currentDir;
+    	GetCurrentDirectory( MAX_PATH, currentDir.GetBufferSetLength(MAX_PATH) );
+    	currentDir.ReleaseBuffer();
 
 	currentDir.Append(_T("\\fallback"));
 
@@ -107,7 +109,7 @@ COctopusCamera::COctopusCamera(CWnd* pParent)
 	if ( glob_m_pLog != NULL ) 
 		glob_m_pLog->Write(_T(" COctopusCamera(CWnd* pParent) "));
 
-	//this is for the old versus andor iXon 
+	//this is for the old versus Andor iXon 
 	em_limit = 255;
 
 	if ( B.Andor_new ) 
@@ -123,18 +125,18 @@ void COctopusCamera::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_GAIN1,      m_g1_text1);
 	DDX_Control(pDX, IDC_STATIC_GAIN2,      m_g1_text2);
 
-    DDX_Text( pDX, IDC_CAS_EXPOSURE_TIME_SINGLE, u32_Exposure_Time_Single_ms);
-    DDV_MinMaxLong(pDX, u32_Exposure_Time_Single_ms, 1, 10000);
+   	DDX_Text( pDX, IDC_CAS_EXPOSURE_TIME_SINGLE, u32_Exposure_Time_Single_ms);
+   	DDV_MinMaxLong(pDX, u32_Exposure_Time_Single_ms, 1, 10000);
 	DDX_Text( pDX, IDC_CAS_EXPOSURE_TIME_MOVIE, u32_Exposure_Time_Movie_ms);
 	DDV_MinMaxLong(pDX, u32_Exposure_Time_Movie_ms, 1, 10000);
 
-    DDX_Text( pDX, IDC_CAS_GAIN_SINGLE, u16_Gain_Mult_Factor_Single);
-    DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Single, 1, em_limit);
-    DDX_Text( pDX, IDC_CAS_GAIN_MOVIE, u16_Gain_Mult_Factor_Movie);
-    DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Movie, 1, em_limit);
+    	DDX_Text( pDX, IDC_CAS_GAIN_SINGLE, u16_Gain_Mult_Factor_Single);
+    	DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Single, 1, em_limit);
+    	DDX_Text( pDX, IDC_CAS_GAIN_MOVIE, u16_Gain_Mult_Factor_Movie);
+    	DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Movie, 1, em_limit);
 
 	DDX_Text( pDX, IDC_CAS_MANUAL_GAIN,	m_IDC_MANUAL_GAIN);
-    DDV_MinMaxDouble(pDX, m_IDC_MANUAL_GAIN, 0.0001, 10.0);
+    	DDV_MinMaxDouble(pDX, m_IDC_MANUAL_GAIN, 0.0001, 10.0);
 	
 	DDX_Text( pDX, IDC_CAS_PICTURES_PER_FILE, m_IDC_PICTURES_PER_FILE);
 	DDV_MinMaxInt(pDX, m_IDC_PICTURES_PER_FILE, 1, 10000);
@@ -151,35 +153,35 @@ void COctopusCamera::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Text(pDX, IDC_CAS_PATHNAME,          pathname_display);
 	DDX_Control(pDX, IDC_CAS_SAVEONOFF_BMP,  m_status_save);
-	DDX_Control(pDX, IDC_CAS_FT,			 m_ctlFTCheckBox);
+	DDX_Control(pDX, IDC_CAS_FT,		 m_ctlFTCheckBox);
 }  
 
 BEGIN_MESSAGE_MAP(COctopusCamera, CDialog)
 
-	ON_BN_CLICKED(IDC_CAS_STARTSTOP_PICTURE,  TakePicture)
-	ON_BN_CLICKED(IDC_CAS_START_MOVIE,	      StartMovie)
-	ON_BN_CLICKED(IDC_CAS_STOP_MOVIE,	      StopCameraThread)
+	ON_BN_CLICKED(IDC_CAS_STARTSTOP_PICTURE, TakePicture)
+	ON_BN_CLICKED(IDC_CAS_START_MOVIE, StartMovie)
+	ON_BN_CLICKED(IDC_CAS_STOP_MOVIE, StopCameraThread)
 
-	ON_BN_CLICKED(IDC_CAS_SETPATH,			  OnSetPath)
+	ON_BN_CLICKED(IDC_CAS_SETPATH, OnSetPath)
 
-	ON_EN_KILLFOCUS(IDC_CAS_EXPOSURE_TIME_SINGLE,   OnKillfocusGeneral)
-	ON_EN_KILLFOCUS(IDC_CAS_EXPOSURE_TIME_MOVIE,    OnKillfocusGeneral)
+	ON_EN_KILLFOCUS(IDC_CAS_EXPOSURE_TIME_SINGLE, OnKillfocusGeneral)
+	ON_EN_KILLFOCUS(IDC_CAS_EXPOSURE_TIME_MOVIE, OnKillfocusGeneral)
 
-	ON_EN_KILLFOCUS(IDC_CAS_GAIN_SINGLE,			OnKillfocusGeneral)
-	ON_EN_KILLFOCUS(IDC_CAS_GAIN_MOVIE,				OnKillfocusGeneral)
+	ON_EN_KILLFOCUS(IDC_CAS_GAIN_SINGLE, OnKillfocusGeneral)
+	ON_EN_KILLFOCUS(IDC_CAS_GAIN_MOVIE, OnKillfocusGeneral)
 
-	ON_EN_KILLFOCUS(IDC_CAS_TEMP_TARGET,			OnKillfocusTempTarget)
-	ON_EN_KILLFOCUS(IDC_CAS_MANUAL_GAIN,			OnKillfocusManualGain)
+	ON_EN_KILLFOCUS(IDC_CAS_TEMP_TARGET, OnKillfocusTempTarget)
+	ON_EN_KILLFOCUS(IDC_CAS_MANUAL_GAIN, OnKillfocusManualGain)
 	
-	ON_EN_KILLFOCUS(IDC_CAS_PICTURES_PER_FILE,		OnKillfocusPicturesPerFile)
+	ON_EN_KILLFOCUS(IDC_CAS_PICTURES_PER_FILE, OnKillfocusPicturesPerFile)
 	
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_GAIN_MANUAL,		OnDisplayGainManual)
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_GAIN_AUTOMATIC,	OnDisplayGainAutomatic)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_GAIN_MANUAL, OnDisplayGainManual)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_GAIN_AUTOMATIC, OnDisplayGainAutomatic)
 
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_1,			OnBinning1x1)
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_2,			OnBinning2x2)
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_4,			OnBinning4x4)
-	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_8,			OnBinning8x8)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_1, OnBinning1x1)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_2, OnBinning2x2)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_4, OnBinning4x4)
+	ON_BN_CLICKED(IDC_CAS_DISPLAY_BIN_8, OnBinning8x8)
 
 	ON_BN_CLICKED(IDC_CAS_VSSPEED_0, OnVSSPEED_0)
 	ON_BN_CLICKED(IDC_CAS_VSSPEED_1, OnVSSPEED_1)
@@ -194,13 +196,13 @@ BEGIN_MESSAGE_MAP(COctopusCamera, CDialog)
 	ON_BN_CLICKED(IDC_CAS_HSSPEED_4, OnHSSPEED_4)
 	ON_BN_CLICKED(IDC_CAS_HSSPEED_5, OnHSSPEED_5)
 	
-    ON_BN_CLICKED(IDC_CAS_GL_0, OnGL_0)
+    	ON_BN_CLICKED(IDC_CAS_GL_0, OnGL_0)
 	ON_BN_CLICKED(IDC_CAS_GL_1, OnGL_1)
 	ON_BN_CLICKED(IDC_CAS_GL_2, OnGL_2)
 
-	ON_BN_CLICKED(IDC_CAS_SAVEONOFF,  OnFileChange)
+	ON_BN_CLICKED(IDC_CAS_SAVEONOFF, OnFileChange)
 	//ON_BN_CLICKED(IDC_CAS_FOCUSONOFF, OnFocusChange)
-	ON_BN_CLICKED(IDC_CAS_FT,         OnBnClickedCasFt)
+	ON_BN_CLICKED(IDC_CAS_FT, OnBnClickedCasFt)
 	ON_WM_TIMER()
 
 END_MESSAGE_MAP()
@@ -242,7 +244,7 @@ COctopusCamera::~COctopusCamera()
 		B.memory = NULL;
 	}
 
-    ShutDown();
+    	ShutDown();
 
 	if( glob_m_pPictureDisplay != NULL ) 
 	{
@@ -369,8 +371,8 @@ void COctopusCamera::TakePicture()
 		SetROI();
 
 	SetImage( B.ROI_actual.bin, B.ROI_actual.bin, \
-		      B.ROI_actual.x1,  B.ROI_actual.x2,  \
-			  B.ROI_actual.y1,  B.ROI_actual.y2 );
+		  B.ROI_actual.x1,  B.ROI_actual.x2,  \
+		  B.ROI_actual.y1,  B.ROI_actual.y2 );
 	
 	if ( glob_m_pPictureDisplay == NULL || B.ROI_changed ) 
 		OpenWindow();
@@ -416,10 +418,11 @@ void COctopusCamera::TakePicture( double exposuretime_ms, int gain )
 		SetROI();
 
 	SetImage( B.ROI_actual.bin, B.ROI_actual.bin, \
-		      B.ROI_actual.x1,  B.ROI_actual.x2,  \
-			  B.ROI_actual.y1,  B.ROI_actual.y2 );
+		  B.ROI_actual.x1,  B.ROI_actual.x2,  \
+		  B.ROI_actual.y1,  B.ROI_actual.y2 );
 	
-	if ( glob_m_pPictureDisplay == NULL || B.ROI_changed ) OpenWindow();
+	if ( glob_m_pPictureDisplay == NULL || B.ROI_changed ) 
+		OpenWindow();
 
 	StartAcquisition();
 	
@@ -435,7 +438,7 @@ void COctopusCamera::TakePicture( double exposuretime_ms, int gain )
 }
 
 /*********************************************************************************
-* Start/stop continuous data aquisition
+* Start/stop continuous data acquisition
 *********************************************************************************/
 
 void COctopusCamera::StartMovie( void )
@@ -466,7 +469,7 @@ void COctopusCamera::StartMovie( void )
 	//if( TTL )
 	//{	
 	//	SetTriggerMode( 1 );		// base external trigger
-	//	SetFastExtTrigger( 1 );     // fast external trigger
+	//	SetFastExtTrigger( 1 );     	// fast external trigger
 	//}
 	//else
 		SetTriggerMode( 0 );		// internal trigger
@@ -485,8 +488,8 @@ void COctopusCamera::StartMovie( void )
 		SetROI();
 	
 	SetImage( B.ROI_actual.bin, B.ROI_actual.bin, \
-		      B.ROI_actual.x1,  B.ROI_actual.x2,  \
-			  B.ROI_actual.y1,  B.ROI_actual.y2 );
+		  B.ROI_actual.x1,  B.ROI_actual.x2,  \
+		  B.ROI_actual.y1,  B.ROI_actual.y2 );
 
 	if ( glob_m_pPictureDisplay == NULL || B.ROI_changed ) 
 		OpenWindow();
@@ -591,7 +594,10 @@ void COctopusCamera::OpenWindow( void )
 	}
 }
 
-void COctopusCamera::OnKillfocusGeneral() { UpdateData( true ); }
+void COctopusCamera::OnKillfocusGeneral() 
+{ 	
+	UpdateData( true ); 
+}
 
 void COctopusCamera::OnKillfocusTempTarget() 
 {
@@ -677,33 +683,33 @@ void COctopusCamera::OnHSSPEED_Report()
 	{
 		B.Ampl_Conv = false;
 		SetOutputAmplifier( 0 ); // EMCCD
-		SetADChannel( 0 );		 // 14 bit
+		SetADChannel( 0 );	 // 14 bit
 		SetHSSpeed( 0, 0 );      // 10Mhz
-		SetPreAmpGain( 1 );		 // 5x
+		SetPreAmpGain( 1 );      // 5x
 	} 
 	else if ( m_DISPLAY_HSSPEED == 1 )
 	{
 		B.Ampl_Conv = false;
 		SetOutputAmplifier( 0 ); // EMCCD
-		SetADChannel( 0 );		 // 14 bit
+		SetADChannel( 0 );	 // 14 bit
 		SetHSSpeed( 0, 1 );      // 5 Mhz
-		SetPreAmpGain( 1 );		 // 5x
+		SetPreAmpGain( 1 );	 // 5x
 	} 
 	else if ( m_DISPLAY_HSSPEED == 2 )
 	{
 		B.Ampl_Conv = false;
 		SetOutputAmplifier( 0 ); // EMCCD
-		SetADChannel( 0 );		 // 14 bit
+		SetADChannel( 0 );	 // 14 bit
 		SetHSSpeed( 0, 2 );      // 3 Mhz
-		SetPreAmpGain( 1 );		 // 5x
+		SetPreAmpGain( 1 );	 // 5x
 	} 
 	else if ( m_DISPLAY_HSSPEED == 3 )
 	{
 		B.Ampl_Conv = false;
 		SetOutputAmplifier( 0 ); // EMCCD
-		SetADChannel( 1 );		 // 16 bit
+		SetADChannel( 1 );	 // 16 bit
 		SetHSSpeed( 0, 3 );      // 1MHz
-		SetPreAmpGain( 1 );		 // 5x
+		SetPreAmpGain( 1 );	 // 5x
 	} 
 	else if ( m_DISPLAY_HSSPEED == 4 )
 	{
@@ -719,7 +725,7 @@ void COctopusCamera::OnHSSPEED_Report()
 		SetOutputAmplifier( 1 ); // Conv 
 		SetADChannel( 0 );       // 14 bit
 		SetHSSpeed( 1, 0 );      // 3 Mhz
-		SetPreAmpGain( 0 );		 // none
+		SetPreAmpGain( 0 );	 // none
 	}
 }
 
@@ -882,7 +888,7 @@ DWORD WINAPI FocusThread(LPVOID lpParameter)
 	{		
 		retval = GetNumberNewImages( &first, &last );
 		
-		// GetNumberNewImages is a wierd function 
+		// GetNumberNewImages is a weird function 
 		// when there is one image to transfer, 
 		// last == first, and thus number of images = 0;
 		// likewise, transfer two images = ... 1, 1+1 and so forth
@@ -935,38 +941,38 @@ BOOL COctopusCamera::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void COctopusCamera::EnableDlg( void ) 
 {
-	GetDlgItem( IDC_CAS_STARTSTOP_PICTURE		)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_START_MOVIE				)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_STOP_MOVIE				)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_EXPOSURE_TIME_SINGLE	)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_EXPOSURE_TIME_MOVIE		)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_PICTURES_PER_FILE		)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_TEMP_TARGET				)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_GAIN_SINGLE				)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_GAIN_MOVIE				)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_1			)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_2			)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_4			)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_8			)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_SETPATH					)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_HSSPEED_0	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_HSSPEED_1	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_HSSPEED_2	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_HSSPEED_3	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_HSSPEED_4	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_HSSPEED_5	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_VSSPEED_0	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_VSSPEED_1	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_VSSPEED_2	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_VSSPEED_3	)->EnableWindow( true );
-	GetDlgItem( IDC_CAS_VSSPEED_4	)->EnableWindow( true );
+	GetDlgItem( IDC_CAS_STARTSTOP_PICTURE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_START_MOVIE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_STOP_MOVIE )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_EXPOSURE_TIME_SINGLE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_EXPOSURE_TIME_MOVIE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_PICTURES_PER_FILE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_TEMP_TARGET	)->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_GAIN_SINGLE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_GAIN_MOVIE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_1 )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_2 )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_4 )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_8 )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_SETPATH )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_HSSPEED_0 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_HSSPEED_1 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_HSSPEED_2 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_HSSPEED_3 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_HSSPEED_4 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_HSSPEED_5 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_VSSPEED_0 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_VSSPEED_1 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_VSSPEED_2 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_VSSPEED_3 )->EnableWindow( true );
+	GetDlgItem( IDC_CAS_VSSPEED_4 )->EnableWindow( true );
 }
 
 void COctopusCamera::DisableDlgMovie( void ) 
 {
-	GetDlgItem( IDC_CAS_STARTSTOP_PICTURE	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_STOP_MOVIE			)->EnableWindow( true  );
-	GetDlgItem( IDC_CAS_START_MOVIE			)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_STARTSTOP_PICTURE )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_STOP_MOVIE )->EnableWindow( true  );
+	GetDlgItem( IDC_CAS_START_MOVIE )->EnableWindow( false );
 	DisableDlg();
 }
 
