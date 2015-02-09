@@ -17,9 +17,23 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
+
 /**********************************************************************************
-******************** COctopusCamera.cpp : implementation file
+Note that the Andor firmware and SDK have known eccentricities. They change over time.
+
+1) The parameters that need to be passed the physical shutter changed at some point.
+
+2) For some reason, the are problems with passing a ‘0’ to SetEMCCDGain when you are in EMCCD mode.
+This makes sense, sort of (why would you be in EMCCD mode in the first place if you
+did not want any gain) but technically you should be able to pass any value from 0-255 if you control 
+the gain via an 8-bit unsigned int. In any case, the new cameras go from 0-1000 (or 1-1000) - this has never been
+clear from the documentation. 
+
+3) GetNumberNewImages() is deeply schizophrenic. When there _is_ one new image, this function returns 0.
+Guys @ Andor - how about returning ‘1’ when there is one new image? Is that too much to ask for? 
+  		
 **********************************************************************************/
+
 
 #include "stdafx.h"
 #include "atmcd32d.h"
@@ -464,7 +478,7 @@ void COctopusCamera::StartMovie( void )
 	if ( B.Ampl_Conv )
 		SetEMCCDGain( 0 );
 	else
-        SetEMCCDGain( int(u16_Gain_Mult_Factor_Movie) );
+        	SetEMCCDGain( int(u16_Gain_Mult_Factor_Movie) );
 
 	//if( TTL )
 	//{	
@@ -923,7 +937,7 @@ DWORD WINAPI FocusThread(LPVOID lpParameter)
 
 void COctopusCamera::OnBnClickedCasFt()
 {
-    int l_ChkBox = m_ctlFTCheckBox.GetCheck();
+    	int l_ChkBox = m_ctlFTCheckBox.GetCheck();
 	
 	if (l_ChkBox == 0) 
 		FrameTransfer = false;
@@ -936,7 +950,7 @@ BOOL COctopusCamera::OnCommand(WPARAM wParam, LPARAM lParam)
 	int id    = LOWORD(wParam); // Notification code
 	if( id == 2 ) return FALSE; // Trap ESC key
 	if( id == 1 ) return FALSE; // Trap RTN key
-    return CDialog::OnCommand(wParam, lParam);
+    	return CDialog::OnCommand(wParam, lParam);
 }
 
 void COctopusCamera::EnableDlg( void ) 
@@ -978,28 +992,28 @@ void COctopusCamera::DisableDlgMovie( void )
 
 void COctopusCamera::DisableDlg( void ) 
 {
-	GetDlgItem( IDC_CAS_HSSPEED_0	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_HSSPEED_1	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_HSSPEED_2	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_HSSPEED_3	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_HSSPEED_4	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_HSSPEED_5	)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_0 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_1 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_2 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_3 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_4 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_HSSPEED_5 )->EnableWindow( false );
 
-	GetDlgItem( IDC_CAS_VSSPEED_0	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_VSSPEED_1	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_VSSPEED_2	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_VSSPEED_3	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_VSSPEED_4	)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_VSSPEED_0 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_VSSPEED_1 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_VSSPEED_2 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_VSSPEED_3 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_VSSPEED_4 )->EnableWindow( false );
 
-	GetDlgItem( IDC_CAS_EXPOSURE_TIME_SINGLE	)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_EXPOSURE_TIME_MOVIE		)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_PICTURES_PER_FILE		)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_TEMP_TARGET				)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_GAIN_SINGLE				)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_GAIN_MOVIE				)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_1			)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_2			)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_4			)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_DISPLAY_BIN_8			)->EnableWindow( false );
-	GetDlgItem( IDC_CAS_SETPATH					)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_EXPOSURE_TIME_SINGLE )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_EXPOSURE_TIME_MOVIE	)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_PICTURES_PER_FILE )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_TEMP_TARGET	)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_GAIN_SINGLE	)->EnableWindow( false );
+	GetDlgItem( IDC_CAS_GAIN_MOVIE )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_1 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_2 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_4 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_DISPLAY_BIN_8 )->EnableWindow( false );
+	GetDlgItem( IDC_CAS_SETPATH )->EnableWindow( false );
 }
