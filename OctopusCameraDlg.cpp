@@ -51,15 +51,15 @@ COctopusCamera::COctopusCamera(CWnd* pParent)
 {    
 	B.files_written			= 0;
 	B.savetofile			= false;
-	B.W						= 0;
-	B.H						= 0;
+	B.W                     = 0;
+	B.H                     = 0;
 	B.automatic_gain		= true;
 	B.manual_gain			= 0.05;
 	B.pics_per_file			= 200;
 	B.Camera_Thread_running = false;
 	B.bin                   = 1;
-	B.memory				= NULL;
-	B.savetime				= 0;
+	B.memory                = NULL;
+	B.savetime              = 0;
 	B.nd_setting            = 0;
 	B.expt_frame            = 0;
 	B.expt_time             = 0;
@@ -124,13 +124,13 @@ void COctopusCamera::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_GAIN2,      m_g1_text2);
 
     DDX_Text( pDX, IDC_CAS_EXPOSURE_TIME_SINGLE, u32_Exposure_Time_Single_ms);
-	DDV_MinMaxLong(pDX, u32_Exposure_Time_Single_ms, 1, 10000);
+    DDV_MinMaxLong(pDX, u32_Exposure_Time_Single_ms, 1, 10000);
 	DDX_Text( pDX, IDC_CAS_EXPOSURE_TIME_MOVIE, u32_Exposure_Time_Movie_ms);
 	DDV_MinMaxLong(pDX, u32_Exposure_Time_Movie_ms, 1, 10000);
 
-	DDX_Text( pDX, IDC_CAS_GAIN_SINGLE, u16_Gain_Mult_Factor_Single);
+    DDX_Text( pDX, IDC_CAS_GAIN_SINGLE, u16_Gain_Mult_Factor_Single);
     DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Single, 1, em_limit);
-	DDX_Text( pDX, IDC_CAS_GAIN_MOVIE, u16_Gain_Mult_Factor_Movie);
+    DDX_Text( pDX, IDC_CAS_GAIN_MOVIE, u16_Gain_Mult_Factor_Movie);
     DDV_MinMaxInt(pDX, u16_Gain_Mult_Factor_Movie, 1, em_limit);
 
 	DDX_Text( pDX, IDC_CAS_MANUAL_GAIN,	m_IDC_MANUAL_GAIN);
