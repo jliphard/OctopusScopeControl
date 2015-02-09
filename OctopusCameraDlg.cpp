@@ -29,9 +29,12 @@ did not want any gain) but technically you should be able to pass any value from
 the gain via an 8-bit unsigned int. In any case, the new cameras go from 0-1000 (or 1-1000) - this has never been
 clear from the documentation. 
 
-3) GetNumberNewImages() is deeply schizophrenic. When there _is_ one new image, this function returns 0.
-Guys @ Andor - how about returning ‘1’ when there is one new image? Is that too much to ask for? 
-  		
+3) GetNumberNewImages(&first, &last) is slightly schizophrenic. When there _is_ one new image, this function (basically) returns 0.
+Guys @ Andor - how about setting up functions called GetNumberNewImages to return 1 when there is 1 new image? 
+The key issue is how you are defining ‘first’ and ‘last’.
+If I start an acquisition, and take one picture, last == first, and therefore (last - first) = 0
+I think you want something like GetNumberNewImages( &u16_NumberNewImages ) and just want u16_NumberNewImages to be equal to the number of new images.
+Why should the user have to worry about your internal circular buffering setup?  		
 **********************************************************************************/
 
 
